@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScienceBoy Physics Quiz</title>
+<style>
+:root{--p:#00f5ff;--s:#7b2fff;--a:#ff6b35;--g:#ffd700;--bg:#020714;--card:rgba(10,20,50,0.88);--tx:#e8f4fd;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;}
+#sf{position:fixed;inset:0;z-index:0;pointer-events:none;}
+body::before,body::after{content:'';position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;}
+body::before{width:500px;height:500px;background:radial-gradient(circle,#7b2fff,transparent 70%);top:-150px;left:-150px;opacity:0.18;animation:n1 14s ease-in-out infinite alternate;}
+body::after{width:400px;height:400px;background:radial-gradient(circle,#00f5ff,transparent 70%);bottom:-100px;right:-100px;opacity:0.15;animation:n2 18s ease-in-out infinite alternate;}
+@keyframes n1{to{transform:translate(60px,80px)scale(1.2);}}
+@keyframes n2{to{transform:translate(-60px,-60px)scale(1.15);}}
+.wrap{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.scr{display:none;width:100%;max-width:780px;background:var(--card);border:1px solid rgba(0,245,255,0.15);border-radius:20px;padding:40px 36px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 0 30px rgba(123,47,255,0.3);animation:fu 0.4s ease;}
+.scr.on{display:block;}
+@keyframes fu{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+/* LOGIN */
+.logo{text-align:center;margin-bottom:28px;}
+.ico{font-size:64px;display:block;animation:fl 4s ease-in-out infinite;}
+@keyframes fl{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.ltitle{font-size:clamp(24px,5vw,38px);font-weight:900;letter-spacing:4px;text-transform:uppercase;background:linear-gradient(135deg,var(--p),var(--s));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.lsub{font-size:11px;letter-spacing:6px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-top:5px;}
+.brow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:28px;}
+.bdg{padding:7px 16px;border-radius:50px;background:rgba(0,245,255,0.07);border:1px solid rgba(0,245,255,0.2);font-size:12px;color:var(--p);}
+.lbl{display:block;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:8px;}
+.inp{width:100%;padding:15px 18px;background:rgba(0,0,0,0.5);border:1px solid rgba(0,245,255,0.2);border-radius:11px;color:var(--tx);font-size:16px;font-family:inherit;outline:none;display:block;margin-bottom:22px;transition:border-color 0.3s,box-shadow 0.3s;}
+.inp::placeholder{color:rgba(255,255,255,0.15);}
+.inp:focus{border-color:var(--p);box-shadow:0 0 16px rgba(0,245,255,0.35);}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 26px;border-radius:11px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:all 0.2s;}
+.bgo{width:100%;background:linear-gradient(135deg,var(--p),var(--s));color:#000;box-shadow:0 4px 20px rgba(0,245,255,0.25);}
+.bgo:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,245,255,0.45);}
+.bnav{background:rgba(0,245,255,0.07);border:1px solid rgba(0,245,255,0.2);color:var(--p);padding:11px 20px;font-size:11px;}
+.bnav:hover{background:rgba(0,245,255,0.15);}
+.bnav:disabled{opacity:0.25;cursor:not-allowed;transform:none;}
+.bsub{background:linear-gradient(135deg,var(--a),#d93500);color:#fff;box-shadow:0 4px 18px rgba(255,107,53,0.3);}
+.bsub:hover{transform:translateY(-2px);}
+/* QUIZ */
+.qhdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px;}
+.stag{font-size:13px;color:rgba(255,255,255,0.4);}
+.stag strong{color:var(--p);}
+.tbox{display:flex;align-items:center;gap:9px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,107,53,0.35);border-radius:9px;padding:9px 16px;}
+.tico{font-size:17px;animation:blk 1s infinite;}
+@keyframes blk{0%,100%{opacity:1;}50%{opacity:0.3;}}
+#tmr{font-size:21px;font-weight:800;color:var(--a);letter-spacing:2px;}
+.tbox.urg{border-color:#ff1744;animation:shk 0.2s infinite;}
+@keyframes shk{0%,100%{transform:translateX(0);}50%{transform:translateX(3px);}}
+.prog{margin-bottom:24px;}
+.pinfo{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:7px;}
+.ptrack{height:5px;background:rgba(255,255,255,0.06);border-radius:10px;overflow:hidden;}
+.pfill{height:100%;width:0%;border-radius:10px;background:linear-gradient(90deg,var(--s),var(--p));box-shadow:0 0 7px rgba(0,245,255,0.5);transition:width 0.4s ease;}
+.qno{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--s);margin-bottom:10px;font-weight:700;}
+.qtxt{font-size:clamp(15px,2.5vw,19px);font-weight:600;line-height:1.6;color:#fff;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.05);}
+.opts{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+.opt{display:flex;align-items:center;gap:14px;padding:13px 16px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:11px;cursor:pointer;transition:all 0.18s;}
+.opt:hover{border-color:rgba(0,245,255,0.28);transform:translateX(4px);}
+.opt.sel{border-color:var(--p);background:rgba(0,245,255,0.08);box-shadow:0 0 16px rgba(0,245,255,0.2);}
+.olet{width:34px;height:34px;flex-shrink:0;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);transition:all 0.18s;color:rgba(255,255,255,0.5);}
+.opt.sel .olet{background:var(--p);color:#000;border-color:var(--p);}
+.otxt{font-size:14px;line-height:1.4;}
+.navrow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.navl{display:flex;gap:9px;}
+/* TOAST */
+.tst{position:fixed;top:18px;left:50%;transform:translateX(-50%);color:#fff;padding:12px 26px;border-radius:50px;font-size:12px;font-weight:700;letter-spacing:1px;z-index:9999;display:none;white-space:nowrap;}
+.tst.w{background:linear-gradient(135deg,#ff1744,#b71c1c);box-shadow:0 4px 20px rgba(255,23,68,0.45);}
+.tst.ok{background:linear-gradient(135deg,#00c853,#006400);box-shadow:0 4px 20px rgba(0,200,83,0.45);}
+/* RESULT */
+.rtitle{font-size:clamp(20px,4vw,32px);font-weight:900;text-align:center;letter-spacing:2px;margin-bottom:28px;background:linear-gradient(135deg,var(--g),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.ringw{display:flex;justify-content:center;margin-bottom:24px;}
+.ringb{position:relative;width:170px;height:170px;}
+.ringb svg{transform:rotate(-90deg);}
+.rbg{fill:none;stroke:rgba(255,255,255,0.05);stroke-width:11;}
+.rfl{fill:none;stroke-width:11;stroke:url(#rg);stroke-linecap:round;stroke-dasharray:490;stroke-dashoffset:490;transition:stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1);}
+.rctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.rsco{font-size:38px;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--p),var(--s));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.rlbl{font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-top:3px;}
+.grw{text-align:center;margin-bottom:24px;}
+.grl{font-size:72px;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--g),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.grt{font-size:11px;letter-spacing:4px;color:rgba(255,255,255,0.3);margin-top:4px;}
+.sts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:11px;margin-bottom:14px;}
+.st{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:13px;padding:16px;text-align:center;}
+.sv{font-size:26px;font-weight:800;color:var(--p);margin-bottom:3px;}
+.sl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.28);}
+.eml{text-align:center;padding:13px;border-radius:11px;margin-bottom:18px;font-size:12px;letter-spacing:1px;border:1px solid rgba(0,245,255,0.18);background:rgba(0,245,255,0.04);color:var(--p);}
+.eml.ok{border-color:rgba(0,200,83,0.28);background:rgba(0,200,83,0.06);color:#00e676;}
+.eml.no{border-color:rgba(255,23,68,0.28);background:rgba(255,23,68,0.06);color:#ff6b6b;}
+.cp{position:fixed;width:8px;height:8px;border-radius:2px;pointer-events:none;z-index:9998;animation:cf 3s ease-in forwards;}
+@keyframes cf{0%{transform:translateY(-10px)rotate(0deg);opacity:1;}100%{transform:translateY(105vh)rotate(720deg);opacity:0;}}
+@media(max-width:560px){.scr{padding:24px 16px;}.qhdr{flex-direction:column;align-items:flex-start;}.navrow{flex-direction:column;}.navl,.bsub{width:100%;}.bnav{flex:1;}}
+</style>
+</head>
+<body>
+<canvas id="sf"></canvas>
+<div class="tst" id="tst"></div>
+<div class="wrap">
+
+<!-- LOGIN -->
+<div class="scr on" id="s0">
+  <div class="logo">
+    <span class="ico">⚛️</span>
+    <div class="ltitle">ScienceBoy</div>
+    <div class="lsub">Physics Challenge</div>
+  </div>
+  <div class="brow">
+    <span class="bdg">⏱ 60 Minutes</span>
+    <span class="bdg">📋 60 Questions</span>
+    <span class="bdg">📧 Auto Email</span>
+  </div>
+  <label class="lbl">Your Full Name</label>
+  <input class="inp" id="ni" placeholder="e.g. Muhammad Ali" autocomplete="off">
+  <button class="btn bgo" onclick="go()">🚀 &nbsp;Launch Quiz</button>
+</div>
+
+<!-- QUIZ -->
+<div class="scr" id="s1">
+  <div class="qhdr">
+    <div class="stag">👨‍🎓 &nbsp;<strong id="sn"></strong></div>
+    <div class="tbox" id="tb"><span class="tico">⏳</span><span id="tmr">60:00</span></div>
+  </div>
+  <div class="prog">
+    <div class="pinfo"><span id="pl">Question 1 of 60</span><span id="pp">0%</span></div>
+    <div class="ptrack"><div class="pfill" id="pf"></div></div>
+  </div>
+  <div class="qno" id="qno">QUESTION 01</div>
+  <div class="qtxt" id="qt"></div>
+  <div class="opts" id="op"></div>
+  <div class="navrow">
+    <div class="navl">
+      <button class="btn bnav" id="pb" onclick="pv()">◀ Prev</button>
+      <button class="btn bnav" id="nb" onclick="nx()">Next ▶</button>
+    </div>
+    <button class="btn bsub" onclick="cs()">Submit ⚡</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="scr" id="s2">
+  <div class="rtitle">🎯 Mission Complete!</div>
+  <div class="ringw">
+    <div class="ringb">
+      <svg viewBox="0 0 170 170" width="170" height="170">
+        <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#7b2fff"/><stop offset="100%" stop-color="#00f5ff"/></linearGradient></defs>
+        <circle class="rbg" cx="85" cy="85" r="78"/>
+        <circle class="rfl" id="rf" cx="85" cy="85" r="78"/>
+      </svg>
+      <div class="rctr"><div class="rsco" id="rs">0</div><div class="rlbl">/ 60</div></div>
+    </div>
+  </div>
+  <div class="grw"><div class="grl" id="gl">A</div><div class="grt" id="gt">EXCELLENT</div></div>
+  <div class="sts">
+    <div class="st"><div class="sv" id="rc" style="color:#00e676">0</div><div class="sl">Correct</div></div>
+    <div class="st"><div class="sv" id="rw" style="color:#ff1744">0</div><div class="sl">Wrong</div></div>
+    <div class="st"><div class="sv" id="rk" style="color:#ffd700">0</div><div class="sl">Skipped</div></div>
+    <div class="st"><div class="sv" id="rp">0%</div><div class="sl">Score</div></div>
+  </div>
+  <div class="eml" id="em">📧 Sending result to teacher...</div>
+  <button class="btn bgo" style="margin-top:8px" onclick="location.reload()">🔄 &nbsp;Try Again</button>
+</div>
+</div>
+
+<script>
+// =============================================
+// EMAILJS - FULLY INLINE, NO EXTERNAL SCRIPTS
+// =============================================
+var EmailJS=(function(){
+  function send(svc,tpl,pub,params){
+    return new Promise(function(ok,fail){
+      var x=new XMLHttpRequest();
+      x.open('POST','https://api.emailjs.com/api/v1.0/email/send',true);
+      x.setRequestHeader('Content-Type','application/json');
+      x.onreadystatechange=function(){
+        if(x.readyState===4){
+          if(x.status===200){ok('OK');}
+          else{fail({s:x.status,t:x.responseText});}
+        }
+      };
+      x.send(JSON.stringify({
+        service_id:svc,
+        template_id:tpl,
+        user_id:pub,
+        template_params:params
+      }));
+    });
+  }
+  return{send:send};
+})();
+
+var SVC='service_hruxzmi';
+var TPL='template_n2x14um';
+var PUB='jDEtUej8vYuW0md-h';
+
+// =============================================
+// STARFIELD
+// =============================================
+(function(){
+  var c=document.getElementById('sf'),ctx=c.getContext('2d'),st=[];
+  function rsz(){c.width=innerWidth;c.height=innerHeight;init();}
+  function init(){st=[];for(var i=0;i<180;i++)st.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.4+0.2,t:Math.random()*6.28,sp:Math.random()*0.03+0.01});}
+  function draw(){ctx.clearRect(0,0,c.width,c.height);st.forEach(function(s){s.t+=s.sp;var a=0.25+0.75*Math.abs(Math.sin(s.t));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,6.28);ctx.fillStyle='rgba(200,225,255,'+a+')';ctx.fill();});requestAnimationFrame(draw);}
+  window.addEventListener('resize',rsz);rsz();draw();
+})();
+
+// =============================================
+// QUIZ ENGINE
+// =============================================
+var Q=[
+{q:"Which of the following groups contains only fundamental SI physical quantities?",o:["Length, force, time","Length, mass, time","Mass, volume, temperature","Temperature, pressure, time"],a:1},
+{q:"The primary scientific disadvantage of traditional measurement units like 'cubit' or 'handspan' is that they:",o:["cannot be written down in decimal format.","vary between individuals, causing regional inconsistencies.","can only be applied to measure small objects.","are restricted strictly to agricultural trade."],a:1},
+{q:"In both the MKS and CGS system of units, which physical quantity is measured using the exact same unit?",o:["Length","Mass","Time","Area"],a:2},
+{q:"A car's speedometer measures speed, which relies on distance covered per unit time. Speed is classified as a:",o:["base quantity, because it is measured directly by a single instrument.","base quantity, because it forms an international standard system.","derived quantity, because it is defined in terms of length and time.","derived quantity, because it changes continuously with vehicle directions."],a:2},
+{q:"Which metric prefix corresponds directly to the mathematical submultiple factor of 10\u207B\u00B3?",o:["Kilo","Centi","Milli","Micro"],a:2},
+{q:"A wire sample is measured to be 250 cm. When converted into standard SI base units, its value should be written as:",o:["0.25 meters","2.5 meters","25.0 meters","2500 meters"],a:1},
+{q:"The smallest distance that can be measured accurately using any given measuring instrument is known as its:",o:["total scale range.","main scale value.","zero deviation.","least count."],a:3},
+{q:"Which specific part of a Vernier caliper is designed to measure the internal diameter of a small cylindrical object like a pen cap?",o:["Main heavy outer jaws","Upper internal jaws","Rear depth-measuring strip","Main horizontal scale bar"],a:1},
+{q:"What is the fundamental purpose of writing experimental measurements in scientific notation?",o:["To switch standard SI units back into traditional local units","To handle very large or very small numbers using powers of ten","To reduce the least count error of an analog instrument","To convert scalar properties automatically into vector properties"],a:1},
+{q:"A classroom desk has a measured length of 2.0 meters and a width of 1.5 meters. Its calculated surface area is:",o:["3.0 square meters","3.5 square meters","0.5 square meters","6.0 square meters"],a:0},
+{q:"The amount of three-dimensional space enclosed within the boundaries of a solid object is defined as its:",o:["planar surface area.","mass density.","total volume.","geometric perimeter."],a:2},
+{q:"Which formula yields the correct area of a trapezium with parallel sides a and b, and a perpendicular height h?",o:["Area = a + b \u00D7 h","Area = \u00BD(a + b) \u00D7 h","Area = (a \u00D7 b) + h","Area = \u00BD(a \u00D7 b) \u00D7 h"],a:1},
+{q:"A circular plate has a radius of exactly 3 meters. Taking \u03C0 \u2248 3.14, the calculated surface area of the plate is:",o:["9.42 m\u00B2","18.84 m\u00B2","28.26 m\u00B2","37.68 m\u00B2"],a:2},
+{q:"A solid storage block shaped as a cube has an edge length of 4 cm. The total volume of this cube is:",o:["16 cm\u00B3","24 cm\u00B3","48 cm\u00B3","64 cm\u00B3"],a:3},
+{q:"An object shaped like a cuboid has a length of 5 cm, a breadth of 3 cm, and a height of 4 cm. Its calculated total volume is:",o:["12 cm\u00B3","23 cm\u00B3","60 cm\u00B3","120 cm\u00B3"],a:2},
+{q:"If a regional merchant historically used traditional units like \"seer\" and \"tola\", what physical quantity were they measuring?",o:["Density","Mass","Weight force","Liquid volume"],a:1},
+{q:"Which of the following contains one base quantity and one derived quantity?",o:["Mass and Time","Distance and Force","Speed and Area","Volume and Pressure"],a:1},
+{q:"The numerical conversion factor of the metric multiplier 'kilo-' is equivalent to:",o:["10\u00B2","10\u00B3","10\u207B\u00B2","10\u207B\u00B3"],a:1},
+{q:"When comparing a rigid meter rod to a flexible measuring tape for work in construction, the measuring tape is more effective because it can:",o:["achieve a significantly smaller least count value.","measure extended continuous lengths and curved paths easily.","eliminate zero error adjustments automatically.","record mass and length properties simultaneously."],a:1},
+{q:"A trapezium has parallel boundary sides measuring 2 cm and 3 cm, with a perpendicular spacing height of 4 cm. What is the total area bounded by this shape?",o:["10 cm\u00B2","12 cm\u00B2","20 cm\u00B2","24 cm\u00B2"],a:0},
+{q:"An object's total surface area is measured in square meters (m\u00B2). Area is classified fundamentally as a:",o:["base quantity, because it is an independent spatial dimension.","base quantity, because it relies directly on standard SI constants.","derived quantity, since it is calculated by multiplying two lengths.","derived quantity, because it can only be evaluated for four-sided shapes."],a:2},
+{q:"Convert an experimental length measurement of 0.056 meters into millimeters (mm) using standard SI conversions:",o:["0.56 mm","5.6 mm","56.0 mm","560.0 mm"],a:2},
+{q:"The metric submultiple prefix 'centi-' corresponds to what mathematical power of ten?",o:["10\u207B\u00B9","10\u207B\u00B2","10\u207B\u00B3","10\u207B\u2076"],a:1},
+{q:"A trapezium shape has an overall area of 728 cm\u00B2. If its parallel sides measure 16 cm and 7 cm respectively, what is the perpendicular height between them?",o:["31.65 cm","63.30 cm","45.50 cm","56.00 cm"],a:1},
+{q:"The total volume of a large cube is measured to be 125 cm\u00B3. What is the individual edge length of this cube?",o:["5 cm","15 cm","25 cm","31.25 cm"],a:0},
+{q:"Which mathematical expression represents the conversion from a number N written in standard decimal form to its proper scientific notation form?",o:["M \u00D7 10\u207F (where 1 \u2264 M < 10 and n is an integer)","M \u00D7 10\u207F (where 0 < M \u2264 10 and n is any fraction)","M \u00D7 5\u207F (where 1 \u2264 M < 10 and n is an integer)","M + 10\u207F (where 1 \u2264 M < 10 and n is an integer)"],a:0},
+{q:"A student measures the thickness of a small plate using a standard meter rod. If the instrument has a standard least count of 1 mm, which recorded value is structurally valid for this device?",o:["12.34 cm","12.3 cm","12.345 cm","12 cm"],a:1},
+{q:"Which of the following physical units is classified as an SI derived unit for measuring force?",o:["Kilogram (kg)","Newton (N)","Meter (m)","Joule (J)"],a:1},
+{q:"A cuboid storage tank has a length of 2 m, a width of 1.5 m, and a height of 3 m. What is the maximum volume of water it can hold?",o:["6.5 m\u00B3","9.0 m\u00B3","12.0 m\u00B3","18.0 m\u00B3"],a:1},
+{q:"A physics student notes down the mathematical expression 10\u00B2 \u2212 10\u207B\u00B2 during a brainstorming session. What is the exact value of this expression in decimal form?",o:["0","99.0","99.99","100.01"],a:2},
+{q:"What property distinguishes physical quantities from non-physical concepts like emotions or ideas?",o:["They can only be observed visually.","They are always constant and never change value.","They can be measured objectively and expressed numerically with units.","They are defined entirely by local regional standards."],a:2},
+{q:"A circular area is given as 124 cm\u00B2. Taking \u03C0 \u2248 3.14, what is the approximate radius of this circle?",o:["5.0 cm","6.3 cm","12.6 cm","39.5 cm"],a:1},
+{q:"If a value is written as 4.5 \u00D7 10\u207B\u00B3 meters, how is this measurement represented in normal decimal form?",o:["0.45 meters","0.045 meters","0.0045 meters","4500 meters"],a:2},
+{q:"Which component of the standard MKS unit system represents the base unit for mass measurement?",o:["Meter","Gram","Kilogram","Second"],a:2},
+{q:"A student needs to measure the precise depth of a small hole inside a wooden block. Which tool should they choose?",o:["Rigid meter rod","Flexible measuring tape","Depth probe strip of a Vernier caliper","Traditional handspan comparison"],a:2},
+{q:"An architectural plan shows a room floor shaped like a trapezium with parallel sides of 4 m and 6 m. If the distance between these sides is 5 m, the total floor area equals:",o:["20 m\u00B2","25 m\u00B2","50 m\u00B2","120 m\u00B2"],a:1},
+{q:"When converting juice bottle capacities from milliliters (mL) to liters (L), a volume of 750 mL is equivalent to:",o:["0.075 L","0.75 L","7.5 L","75.0 L"],a:1},
+{q:"Which option presents a proper SI unit symbol along with its correct physical quantity matching?",o:["Meter \u2192 m (Length)","Kilogram \u2192 K (Mass)","Second \u2192 sec (Time)","Kelvin \u2192 k (Temperature)"],a:0},
+{q:"A rectangular dynamic area formula is stated as Area = Length \u00D7 Width. If both dimensions are doubled, the newly calculated area will:",o:["remain unchanged.","double in value.","increase by three times.","increase by four times."],a:3},
+{q:"The prefix 'micro-' is a submultiplicative factor used in measurements. Its value is smaller than 'milli-' by a factor of:",o:["10","100","1000","10000"],a:2},
+{q:"A metal cylinder is measured using the external jaws of a Vernier caliper to find its outer diameter. Why is this instrument preferred over a standard meter rod for this task?",o:["The caliper can measure longer spans than a meter rod.","The caliper has a significantly finer least count than 1 mm.","The meter rod is flexible and bends around cylindrical profiles.","The caliper automatically displays values in scientific notation form."],a:1},
+{q:"Express the value 0.000034 meters in proper scientific notation form:",o:["3.4 \u00D7 10\u207B\u2074 m","3.4 \u00D7 10\u207B\u2075 m","34.0 \u00D7 10\u207B\u2076 m","0.34 \u00D7 10\u207B\u2074 m"],a:1},
+{q:"A circle has a total diameter of 12 cm. Using the area formula for a circle, what is its area?",o:["37.68 cm\u00B2","113.04 cm\u00B2","452.16 cm\u00B2","144.00 cm\u00B2"],a:1},
+{q:"A cuboid package has dimensions 10 cm \u00D7 5 cm \u00D7 2 cm. Its calculated volumetric capacity is:",o:["17 cm\u00B3","50 cm\u00B3","100 cm\u00B3","200 cm\u00B3"],a:2},
+{q:"Which of the following describes the core difference between area and volume calculations?",o:["Area applies to 3D shapes while volume applies to 2D shapes.","Area is measured in cubic units while volume is in square units.","Area evaluates surface dimensions (2D) while volume evaluates spatial capacity (3D).","Area is a base physical quantity while volume is a derived quantity."],a:2},
+{q:"If a scale has a least count of 0.1 cm, a student measuring a wooden panel edge should record the value as:",o:["45 mm","4.5 cm","0.045 m","All of the above are mathematically equivalent and match the instrument precision."],a:3},
+{q:"Convert a raw weight measurement of 5000 grams into standard SI base units:",o:["0.5 kg","5.0 kg","50.0 kg","500.0 kg"],a:1},
+{q:"An analyst writes down the distance to another city as 1.609 \u00D7 10\u00B3 meters. What is this value in ordinary decimal notation?",o:["16.09 meters","160.9 meters","1609 meters","16090 meters"],a:2},
+{q:"The CGS system stands for which precise combination of units?",o:["Centimeter - Gram - Second","Centimeter - Gravity - Scale","Coulomb - Gram - Second","Celsius - Gram - Standard"],a:0},
+{q:"A solid square tile has an area of 49 cm\u00B2. What is the perimeter length around this entire tile?",o:["7 cm","14 cm","28 cm","49 cm"],a:2},
+{q:"Which derived physical quantity is defined as mass per unit volume?",o:["Weight","Pressure","Area","Density"],a:3},
+{q:"A trapezium profile features two parallel bases of lengths 5 cm and 7 cm. If the calculated area is 24 cm\u00B2, what is its perpendicular height?",o:["2 cm","4 cm","6 cm","8 cm"],a:1},
+{q:"What value is obtained when converting 3.5 meters directly into centimeters (cm)?",o:["35 cm","350 cm","3500 cm","0.035 cm"],a:1},
+{q:"In scientific notation, if the decimal point of a number greater than 1 is shifted 4 places to the left, the exponent of 10 will be:",o:["+4","-4","+2","-2"],a:0},
+{q:"A metal sheet contains a triangular cutout with a base of 4 cm and a height of 3 cm. The surface area removed from the sheet is:",o:["6 cm\u00B2","12 cm\u00B2","24 cm\u00B2","7 cm\u00B2"],a:0},
+{q:"Which of the following is an unacceptable way to express an SI measurement due to formatting rules?",o:["10 kg","5 m/s","25 mms","100 N"],a:2},
+{q:"A small stone block has a volume of 8 cm\u00B3. If it is shaped like a perfect cube, the length of each side is:",o:["2 cm","4 cm","8 cm","1.33 cm"],a:0},
+{q:"Which part of the Vernier caliper is used to verify the depth of a blind hole or step value inside an industrial component?",o:["The inner upper sliding jaws","The outer lower stationary jaws","The narrow depth bar projecting from the rear scale","The main fixed scale body"],a:2},
+{q:"A student multiplies a length profile value of 5.0 \u00D7 10\u00B3 m by a width profile value of 2.0 \u00D7 10\u00B2 m. The calculated area in scientific notation form is:",o:["10.0 \u00D7 10\u2075 m\u00B2","1.0 \u00D7 10\u2075 m\u00B2","1.0 \u00D7 10\u2076 m\u00B2","1.0 \u00D7 10\u2074 m\u00B2"],a:2},
+{q:"An automated fluid dispenser unloads 2.5 cubic meters (m\u00B3) of water. Since 1 m\u00B3 = 1000 liters, what is this exact volumetric discharge expressed in liters?",o:["25 L","250 L","2500 L","25000 L"],a:2}
+];
+
+var L=['A','B','C','D'];
+var cur=0,ans=new Array(Q.length).fill(null),sec=3600,ti,viol=0,uname='';
+
+function go(){
+  var n=document.getElementById('ni').value.trim();
+  if(!n){
+    var i=document.getElementById('ni');
+    i.style.borderColor='#ff1744';
+    setTimeout(function(){i.style.borderColor='rgba(0,245,255,0.2)';},1200);
+    return;
+  }
+  uname=n;
+  document.getElementById('sn').textContent=n;
+  document.getElementById('s0').classList.remove('on');
+  document.getElementById('s1').classList.add('on');
+  try{document.documentElement.requestFullscreen();}catch(e){}
+  shQ();
+  ti=setInterval(function(){
+    sec--;
+    var m=Math.floor(sec/60),s=sec%60;
+    document.getElementById('tmr').textContent=m+':'+(s<10?'0':'')+s;
+    if(sec<=120)document.getElementById('tb').classList.add('urg');
+    if(sec<=0)sub();
+  },1000);
+}
+
+document.addEventListener('visibilitychange',function(){
+  if(document.hidden&&document.getElementById('s1').classList.contains('on')){
+    viol++;
+    toast('⚠️ Tab Switch Warning '+viol+'/3','w');
+    if(viol>=3)sub();
+  }
+});
+
+function toast(msg,t){
+  var el=document.getElementById('tst');
+  el.textContent=msg;el.className='tst '+(t||'w');el.style.display='block';
+  clearTimeout(el._t);el._t=setTimeout(function(){el.style.display='none';},3200);
+}
+
+function shQ(){
+  var q=Q[cur],pct=Math.round((cur+1)/Q.length*100);
+  document.getElementById('qno').textContent='QUESTION '+(cur+1<10?'0':'')+(cur+1);
+  document.getElementById('qt').textContent=q.q;
+  document.getElementById('pl').textContent='Question '+(cur+1)+' of '+Q.length;
+  document.getElementById('pp').textContent=pct+'%';
+  document.getElementById('pf').style.width=pct+'%';
+  document.getElementById('pb').disabled=(cur===0);
+  document.getElementById('nb').disabled=(cur===Q.length-1);
+  var w=document.getElementById('op');w.innerHTML='';
+  q.o.forEach(function(o,i){
+    var d=document.createElement('div');
+    d.className='opt'+(ans[cur]===i?' sel':'');
+    d.innerHTML='<div class="olet">'+L[i]+'</div><div class="otxt">'+o+'</div>';
+    (function(idx){d.onclick=function(){ans[cur]=idx;w.querySelectorAll('.opt').forEach(function(el,j){el.classList.toggle('sel',j===idx);});};})(i);
+    w.appendChild(d);
+  });
+}
+
+function nx(){if(cur<Q.length-1){cur++;shQ();}}
+function pv(){if(cur>0){cur--;shQ();}}
+
+function cs(){
+  var sk=ans.filter(function(a){return a===null;}).length;
+  if(sk>0&&!confirm(sk+' question(s) unanswered. Submit anyway?'))return;
+  sub();
+}
+
+function sub(){
+  clearInterval(ti);
+  try{document.exitFullscreen();}catch(e){}
+  var c=0,w=0,k=0;
+  Q.forEach(function(q,i){if(ans[i]===null)k++;else if(ans[i]===q.a)c++;else w++;});
+  var pct=(c/Q.length*100).toFixed(1);
+  var tk=3600-sec,grade,gt;
+  var ttaken=Math.floor(tk/60)+'m '+(tk%60)+'s';
+  if(pct>=90){grade='A+';gt='OUTSTANDING';}
+  else if(pct>=80){grade='A';gt='EXCELLENT';}
+  else if(pct>=70){grade='B';gt='VERY GOOD';}
+  else if(pct>=60){grade='C';gt='GOOD';}
+  else if(pct>=50){grade='D';gt='SATISFACTORY';}
+  else{grade='F';gt='NEEDS IMPROVEMENT';}
+  document.getElementById('rc').textContent=c;
+  document.getElementById('rw').textContent=w;
+  document.getElementById('rk').textContent=k;
+  document.getElementById('rp').textContent=pct+'%';
+  document.getElementById('rs').textContent=c;
+  document.getElementById('gl').textContent=grade;
+  document.getElementById('gt').textContent=gt;
+  document.getElementById('s1').classList.remove('on');
+  document.getElementById('s2').classList.add('on');
+  setTimeout(function(){document.getElementById('rf').style.strokeDashoffset=490-(c/Q.length)*490;},200);
+  if(parseFloat(pct)>=50)confetti();
+  var now=new Date();
+  EmailJS.send(SVC,TPL,PUB,{
+    student_name:uname,
+    score:String(c),
+    total:String(Q.length),
+    percent:pct+'%',
+    grade:grade+' - '+gt,
+    time:now.toLocaleDateString()+' '+now.toLocaleTimeString()+' | Taken: '+ttaken
+  }).then(function(){
+    document.getElementById('em').textContent='✅ Result sent to teacher!';
+    document.getElementById('em').className='eml ok';
+  }).catch(function(){
+    document.getElementById('em').textContent='⚠️ Could not email teacher. Please inform manually.';
+    document.getElementById('em').className='eml no';
+  });
+}
+
+function confetti(){
+  var cl=['#00f5ff','#7b2fff','#ffd700','#ff6b35','#00e676','#ff1744'];
+  for(var i=0;i<60;i++){
+    (function(d){setTimeout(function(){
+      var p=document.createElement('div');p.className='cp';
+      p.style.cssText='left:'+Math.random()*100+'vw;top:-8px;background:'+cl[Math.floor(Math.random()*cl.length)]+';animation-duration:'+(2+Math.random()*2)+'s;';
+      document.body.appendChild(p);setTimeout(function(){p.remove();},4500);
+    },d);})(i*40);
+  }
+}
+</script>
+</body>
+</html>
